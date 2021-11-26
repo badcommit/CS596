@@ -1,0 +1,8 @@
+venv/*
+out/*
+render/*
+demo/*
+data/*
+__pycache__
+.DS_Store
+.idea/
