@@ -48,19 +48,19 @@ I choose to implement an (outdated) [APIC](https://www.math.ucla.edu/~jteran/pap
 
 <div style="display:inline-block; width:30%">
 <figure style="width: 100%">
-<img src="https://i.imgur.com/vktZ7Am.gif" />
+<img src="https://i.imgur.com/vktZ7Am.gif" width="200" />
 <figcaption>Basic Model</figcaption>
 </figure>
 </div> 
 <div style="display:inline-block; width: 30%">
 <figure  style="width: 100%">
-<img src="https://i.imgur.com/2dHhn7R.gif"/>
+<img src="https://i.imgur.com/2dHhn7R.gif"  width="200"/>
 <figcaption>3D visualization</figcaption>
 </figure>
 </div>
 <div style="display:inline-block; width:30%">
 <figure  style="width: 100%">
-<img src="https://i.imgur.com/IQ20R3n.gif"/>
+<img src="https://i.imgur.com/IQ20R3n.gif" width="200"/>
 <figcaption>4-nodes MPI-GPU computatoin</figcaption>
 </figure>
 </div>
