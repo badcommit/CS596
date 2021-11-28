@@ -48,7 +48,7 @@ I choose to implement an (outdated) [APIC](https://www.math.ucla.edu/~jteran/pap
 
 <div style="display:inline-block; width:30%">
 <figure style="width: 100%">
-<img src="https://i.imgur.com/vENxvfL.gif" />
+<img src="https://i.imgur.com/vktZ7Am.gif" />
 <figcaption>Basic Model</figcaption>
 </figure>
 </div> 
@@ -60,7 +60,7 @@ I choose to implement an (outdated) [APIC](https://www.math.ucla.edu/~jteran/pap
 </div>
 <div style="display:inline-block; width:30%">
 <figure  style="width: 100%">
-<img src="https://i.imgur.com/0580xnd.gif"/>
+<img src="https://i.imgur.com/IQ20R3n.gif"/>
 <figcaption>4-nodes MPI-GPU computatoin</figcaption>
 </figure>
 </div>
