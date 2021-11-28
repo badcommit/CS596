@@ -3,19 +3,29 @@ import numpy as np
 import time
 ti.init()
 if __name__ == '__main__':
-    gui = ti.GUI('MPM88')
+    gui = ti.GUI('My MPM88')
     it = 0
+    filecnt = 4
+    end_it = 21
+    input_name = 'out4'
     while gui.running and not gui.get_event(gui.ESCAPE):
-        data = np.genfromtxt(fname='out/1-output-{}.txt'.format(it),  delimiter=",")
+        data = None
+        for d in range(filecnt):
+            new_data = np.genfromtxt(fname='{}/{}-output-{}.txt'.format(input_name, d, it), delimiter=",")
+            new_data = new_data.reshape((-1, 2))
+            if data is None:
+                data = new_data
+            else:
+                data = np.vstack([data, new_data])
+        #
         print(data.shape)
         gui.clear(0x112F41)
-        gui.circles(data, radius=1, color=0x068587)
-
+        gui.circles(data, radius=2, color=0x068587)
         gui.show()
         it += 1
-        if it >= 20:
+        if it >= end_it:
             break
-        time.sleep(0.5)
+        time.sleep(0.2)
 
     #
     #     for i in range(data.shape[0]):

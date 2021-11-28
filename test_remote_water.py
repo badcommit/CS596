@@ -2,7 +2,7 @@ import taichi as ti
 
 ti.init(arch=ti.gpu)
 
-n_particles = 8192
+n_particles = 16
 n_grid = 128
 dx = 1 / n_grid
 dt = 2e-4
@@ -82,10 +82,8 @@ def init():
 
 
 init()
-gui = ti.GUI('MPM88')
-while gui.running and not gui.get_event(gui.ESCAPE):
-    for s in range(50):
-        substep()
-    gui.clear(0x112F41)
-    gui.circles(x.to_numpy(), radius=1, color=0x068587)
-    gui.show()
+# gui = ti.GUI('MPM88')
+
+for s in range(50):
+    substep()
+print(x.to_numpy())
