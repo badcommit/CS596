@@ -36,11 +36,11 @@ grid_m = ti.field(float, (n_grid, n_grid))
 
 @ti.kernel
 def p2g(particle_count: int):
-    # ti.static_print(rank, 'grid assign')
+
     for i, j in grid_m:
         grid_v[i, j] = [0, 0]
         grid_m[i, j] = 0
-    # ti.static_print(rank, 'particle assign')
+
     for p in range(n_particles):
         if p >= particle_count:
            continue
@@ -57,7 +57,7 @@ def p2g(particle_count: int):
 
             grid_v[base + offset] += weight * (p_mass * v[p] + affine @ dpos)
             grid_m[base + offset] += weight * p_mass
-    # ti.static_print(rank, 'done particle assign')
+
 
 @ti.kernel
 def g_cal():
@@ -107,7 +107,6 @@ def sync_grid(it):
     TAG = int(hashlib.sha1(TAG.encode("utf-8")).hexdigest(), 16) % 1000009
     grid_start = rank * n_grid // n_nodes
     grid_end = (rank+1) * n_grid // n_nodes
-    # p2g kernel affects 2 borders
 
     if rank > 0:
         m_value = {}
@@ -179,7 +178,6 @@ def transfer_particle(it):
         elif x[p].x >= x_grid_right_border:
             right.append(p_info)
         else:
-
             new_particle.append(p_info)
     left_req, right_req = None, None
     if rank > 0:
@@ -205,7 +203,7 @@ def transfer_particle(it):
             new_particle.append(particle_info)
 
     cur_particle_num = len(new_particle)
-    # print('len', it, rank, cur_particle_num, flush=True)
+
     for i, particle_info in enumerate(new_particle):
         px, py = particle_info[0]
         vx, vy = particle_info[1]
@@ -215,9 +213,6 @@ def transfer_particle(it):
         v[i].x, v[i].y = vx, vy
         J[i] = j
         C[i][0, 0], C[i][0, 1], C[i][1, 0], C[i][1, 1] = c
-        #if px > 1:
-        #    raise Exception("{}-{}-{}".format(it, rank, cur_particle_num))
-        #print("hi", rank, it, i, px, py, vx, vy, j, c, flush=True)
 
 
 def substep(it, debug=False):
@@ -256,7 +251,6 @@ def init(particle_count: int):
 def write_data(it, data):
     np.savetxt('out4/{}-output-{}.txt'.format(rank, it), data, delimiter=",")
 
-
 def iteration():
     print(rank, '---init-----', flush=True)
     init(cur_particle_num)
@@ -270,6 +264,7 @@ def iteration():
         write_data(it, data[:cur_particle_num, :])
         print('{}-{} time %s seconds'.format(rank, it, time.time() - start_time))
     print('Finish! {} time {} seconds'.format(rank, time.time() - start_time))
+
 if __name__ == '__main__': iteration()
 
 

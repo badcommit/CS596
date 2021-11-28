@@ -5,9 +5,9 @@ ti.init()
 if __name__ == '__main__':
     gui = ti.GUI('My MPM88')
     it = 0
-    filecnt = 4
-    end_it = 21
-    input_name = 'out4'
+    filecnt = 8
+    end_it = 100
+    input_name = 'out8'
     while gui.running and not gui.get_event(gui.ESCAPE):
         data = None
         for d in range(filecnt):
@@ -17,7 +17,6 @@ if __name__ == '__main__':
                 data = new_data
             else:
                 data = np.vstack([data, new_data])
-        #
         print(data.shape)
         gui.clear(0x112F41)
         gui.circles(data, radius=2, color=0x068587)
@@ -25,8 +24,5 @@ if __name__ == '__main__':
         it += 1
         if it >= end_it:
             break
-        time.sleep(0.2)
-
-    #
-    #     for i in range(data.shape[0]):
+        time.sleep(0.1)
 
