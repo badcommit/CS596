@@ -3,8 +3,8 @@
 #SBATCH --ntasks=4
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=gpu
-#SBATCH --time=01:30:00
-#SBATCH --output=log.txt
+#SBATCH --time=00:10:00
+#SBATCH --output=log4.txt
 #SBATCH -A anakano_429
 #SBATCH --gres=gpu:v100:1
 module purge

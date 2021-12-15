@@ -160,25 +160,38 @@ def transfer_particle(it):
     global cur_particle_num
     TAG = ("{}-{}".format(it, 1))
     TAG = int(hashlib.sha1(TAG.encode("utf-8")).hexdigest(), 16) % 1000009
-    right = []
-    left = []
+
     x_grid_left_border = n_grid // n_nodes * rank * dx
     x_grid_right_border = n_grid // n_nodes * (rank+1) * dx
-    new_particle = []
-    for p in range(cur_particle_num):
-        p_info = [[x[p].x, x[p].y],
-                  [v[p].x, v[p].y],
-                  float(J[p]),
-                  [C[p][0, 0],
-                   C[p][0, 1],
-                   C[p][1, 0],
-                   C[p][1, 1]]]
-        if x[p].x < x_grid_left_border:
-            left.append(p_info)
-        elif x[p].x >= x_grid_right_border:
-            right.append(p_info)
-        else:
-            new_particle.append(p_info)
+
+    current_particle_x = x.to_numpy()
+    current_particle_v = v.to_numpy()
+    current_particle_C = C.to_numpy()
+    current_particle_J = J.to_numpy()
+
+    # check which particle is beyond border
+    left_index = current_particle_x[:, 0] < x_grid_left_border
+    right_index = current_particle_x[:, 0] >= x_grid_right_border
+    conserved_index = (current_particle_x[:, 0] >= x_grid_left_border) & (current_particle_x[:, 0] < x_grid_right_border)
+
+    # prepare transfered data
+    left_x_transfer = current_particle_x[left_index, :]
+    left_v_transfer = current_particle_v[left_index, :]
+    left_J_transfer = current_particle_J[left_index, :]
+    left_C_transfer = current_particle_C[left_index, :]
+    left = [left_x_transfer, left_v_transfer, left_J_transfer, left_C_transfer]
+    # print('left send data', it, rank, left_x_transfer.shape, flush=True)
+    right_x_transfer = current_particle_x[right_index, :]
+    right_v_transfer = current_particle_v[right_index, :]
+    right_J_transfer = current_particle_J[right_index, :]
+    right_C_transfer = current_particle_C[right_index, :]
+    right = [right_x_transfer, right_v_transfer, right_J_transfer, right_C_transfer]
+    # print('right send data', it, rank, right_x_transfer.shape,  flush=True)
+    remain_x = current_particle_x[conserved_index, :]
+    remain_v = current_particle_v[conserved_index, :]
+    remain_J = current_particle_J[conserved_index, :]
+    remain_C = current_particle_C[conserved_index, :]
+
     left_req, right_req = None, None
     if rank > 0:
         left_req = comm.irecv(source=rank - 1, tag=TAG)
@@ -188,31 +201,37 @@ def transfer_particle(it):
         comm.send(left, dest=rank-1, tag=TAG)
     if rank < n_nodes - 1:
         comm.send(right, dest=rank+1, tag=TAG)
+
     if left_req:
         data = left_req.wait()
         # if data:
         #     print('left data', it, rank, data,  flush=True)
-        for particle_info in data:
-            new_particle.append(particle_info)
+        new_x, new_v, new_J, new_C = data
+        # print("???? left", new_x.shape, new_v.shape)
+        if new_x.shape[0] > 0:
+            remain_x = np.hstack([remain_x, new_x])
+            remain_v = np.hstack([remain_v, new_v])
+            remain_J = np.hstack([remain_J, new_J])
+            remain_C = np.hstack([remain_C, new_C])
+
     if right_req:
 
         data = right_req.wait()
+        new_x, new_v, new_J, new_C = data
         # if data:
         #     print('right data', it, rank, data, flush=True)
-        for particle_info in data:
-            new_particle.append(particle_info)
+        # print("???? right", new_x.shape, new_v.shape)
+        if new_x.shape[0] > 0:
+            remain_x = np.hstack([remain_x, new_x])
+            remain_v = np.hstack([remain_v, new_v])
+            remain_J = np.hstack([remain_J, new_J])
+            remain_C = np.hstack([remain_C, new_C])
 
-    cur_particle_num = len(new_particle)
-
-    for i, particle_info in enumerate(new_particle):
-        px, py = particle_info[0]
-        vx, vy = particle_info[1]
-        j = particle_info[2]
-        c = particle_info[3]
-        x[i].x, x[i].y = px, py
-        v[i].x, v[i].y = vx, vy
-        J[i] = j
-        C[i][0, 0], C[i][0, 1], C[i][1, 0], C[i][1, 1] = c
+    cur_particle_num = remain_x.shape[0]
+    x.from_numpy(remain_x)
+    v.from_numpy(remain_v)
+    J.from_numpy(remain_J)
+    C.from_numpy(remain_C)
 
 
 def substep(it, debug=False):
